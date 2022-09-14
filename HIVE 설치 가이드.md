@@ -1,0 +1,109 @@
+### 1. Hive 다운 및 압축 해제하기
+
+1) wget https://downloads.apache.org/hive/hive-3.1.3/apache-hive-3.1.3-bin.tar.gz
+2) tar xzf apache-hive-3.1.3-bin.tar.gz
+ls 로 압축 해제 완료를 확인하자
+
+—
+
+### 2. Hive 환경 변수 설정하기(bashrc)
+
+1) **nano .bashrc**
+.bashrc의 맨 밑에 아래의 문구를 추가시켜주고, ctrl+x -> y -> enter로 저장한다.
+```bash
+export HIVE_HOME=“/home/hdoop/apache-hive-3.1.2-bin”
+export PATH=$PATH:$HIVE_HOME/bin
+```
+2) **source ~/.bashrc**
+
+—
+### 3. hive-config.sh 파일 편집하기
+
+- **Hive는 HDFS와 상호작용을 해야된다.
+
+1) **nano $HIVE_HOME/bin/hive-config.sh**
+2) **export HADOOP_HOME=/home/hdoop/hadoop-3.2.1**
+> HADOOP_HOME 의 경우 nano .bashrc 안에 적힌 위치와 동일하게 입력하자
+![hive-config.sh](Scala 언어 학습/asset/c855cde357f02fb123bab3591de55e2f.png)
+저장하고 나옴
+
+—
+### 4. HDFS에 Hive directory 만들기
+
+- hdfs layer에 데이터를 저장하기 위해 분리된 두 개의 디렉토리를 생성
+- (tmp 와 다른 하나 메인)
+- HDFS를 사용하므로 hadoop 먼저실행 **(start-dfs.sh)**
+![start-dfs.sh](Scala 언어 학습/asset/afc3194325f83717508b39a36324441b.png)
+**1) tmp directory 생성**
+-tmp directory는 Hive process의 중간 데이터 결과를 저장하는 용도로 사용하자
+
+1-1) `hdfs dfs -mkdir /tmp`
+
+1-2) `hdfs dfs -chmod g+w /tmp`
+쓰기 실행 권한 부여
+
+1-3) `hdfs dfs -ls /`
+권한 추가되었는지 확인
+![-ls](Scala 언어 학습/asset/9b49276d453cd82c76684d9642c47c18.png)
+
+
+**2) warehouse directory 생성**
+2-1) `hdfs dfs -mkdir -p /user/hive/warehouse`
+2-2) `hdfs dfs -chmod g+w /user/hive/warehouse`
+2-3) `hdfs dfs -ls /user/hive`
+
+—
+### 5. hive-site.xml 파일 설정하기
+
+1) `cd $HIVE_HOME/conf`
+2) `cp hive-default.xml.template hive-site.xml`
+cp a b : a를 b 이름으로 복제본 만듦
+3) `nano hive-site.xml`
+-property 로 시작되는 부분을 찾아 아래의 두 개의 property를 추가시키자.
+```xml
+<property>
+    <name>system:jave.io.tmpdir</name>
+    <value>/tmp/hive/java</value>
+</property>
+
+<property>
+    <name>system:user.name</name>
+    <value>${user.name}</value>
+</property>
+```
+그 이후 `Ctrl + w` 키로 검색창을 켜고 `javax.jdo.option.ConnectionURL` 을 검색하여 property를 찾고 value 를 `jdbc:derby:/home/hdoop/apache-hive3.1.3-bin/metastore\_db;databaseName=metastore\_db;create=true`로 수정해주자
+
+—
+### 6. derby database 시작하기
+`$HIVE_HOME/bin/schematool -initSchema -dbType derby` 을 실행해야하는데 오류가 날 것이다. (java.lang.NoSuchMethodError)
+hadoop ↔ hive 간 guava version 호환성 문제를 해결하러 가자
+
+1) `ls $HIVE_HOME/lib`
+![hive guava version](8abb72878389dfab58eb14e49777f9ce.png)
+
+hive의 guava version 은 19.0
+
+2) `ls $HADOOP_HOME/share/hadoop/hdfs/lib`
+![hadoop guava version](Scala 언어 학습/asset/54cb368c5cc42d3c9d0463fc98ef76c6.png)
+
+hadoop의 guava version 은 27.0
+
+3) `rm $HIVE_HOME/lib/guava-19.0jar`
+- hive의 guava 삭제
+4) `cp $HADOOP_HOME/share/hadoop/hdfs/lib/guava-27.0-jre.jar $HIVE_HOME/lib/`
+- hadoop의 guava를 hive에 복사
+
+다시 `$HIVE_HOME/bin/schematool -initSchema -dbType derby`
+또 에러 발생! line 3223, column96 에 이상한 문자가 있다
+
+`cd $HIVE_HOME/conf` 로 이동해서 
+`nano hive-site.xml` 켜고
+`ctrl + shift + -` 입력하면 행,열 이동가능 `3223,96` 입력해서 특수기호 들어간 것들 지워주자.
+ `$HIVE_HOME/bin/schematool -initSchema -dbType derby` 재시도.
+ 
+ —
+ ### 7. HIVE Client Shell 시작하기
+ 1) `cd $HIVE_HOME/bin`
+ 2) `hive`
+ ![최종](Scala 언어 학습/asset/0ac8397d442c2a6691f5a893cea0c2f3.png)
+ 
