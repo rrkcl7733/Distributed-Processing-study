@@ -107,3 +107,18 @@ hadoop의 guava version 은 27.0
  2) `hive`
  ![최종](Scala 언어 학습/asset/0ac8397d442c2a6691f5a893cea0c2f3.png)
  
+
+—
+### 부록 hql 파일 생성 및 실행
+1) `touch 이름.hql`
+2) `nano 이름.hql` or 파일 직접 들어가서 작성
+3) `hive -f 이름.hql` 하면 실행 됨
+
+#### hive 명령어 아무데서 나 막 치면 안 됨.
+
+**HiveException java.lang.RuntimeException: Unable to instantiate**
+오류뜰 때 팁.
+```bash
+rm -rf metastore_db/
+schematool -initSchema -dbType derby
+```
