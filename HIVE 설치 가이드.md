@@ -11,7 +11,7 @@ ls 로 압축 해제 완료를 확인하자
 1) **nano .bashrc**
 .bashrc의 맨 밑에 아래의 문구를 추가시켜주고, ctrl+x -> y -> enter로 저장한다.
 ```bash
-export HIVE_HOME=“/home/hdoop/apache-hive-3.1.2-bin”
+export HIVE_HOME=“/home/hdoop/apache-hive-3.1.3-bin”
 export PATH=$PATH:$HIVE_HOME/bin
 ```
 2) **source ~/.bashrc**
@@ -22,7 +22,7 @@ export PATH=$PATH:$HIVE_HOME/bin
 - **Hive는 HDFS와 상호작용을 해야된다.
 
 1) **nano $HIVE_HOME/bin/hive-config.sh**
-2) **export HADOOP_HOME=/home/hdoop/hadoop-3.2.1**
+2) **export HADOOP_HOME=/home/hadoop/hadoop-3.2.1**
 > HADOOP_HOME 의 경우 nano .bashrc 안에 적힌 위치와 동일하게 입력하자
 ![hive-config.sh](Scala 언어 학습/asset/c855cde357f02fb123bab3591de55e2f.png)
 저장하고 나옴
