@@ -122,3 +122,46 @@ hadoop의 guava version 은 27.0
 rm -rf metastore_db/
 schematool -initSchema -dbType derby
 ```
+
+- start-dfs..sh 이후에 바로 `hive` 명령어 X / 하둡 실행되는 동안 초기 몇 초는 safe mode 돌입됨.
+
+hdfs 의 문서를 hive 에 가져오는 방법
+```sql
+DROP TABLE IF EXISTS MULGA;
+
+CREATE EXTERNAL TABLE IF NOT EXISTS MULGA (
+a DATE,
+b STRING,
+c INT,
+d STRING,
+e STRING,
+f INT,
+g STRING,
+h INT,
+i INT
+)
+ROW FORMAT DELIMITED
+FIELDS TERMINATED BY '\t'
+STORED AS TEXTFILE
+LOCATION '/user/hive/mulga'
+tblproperties ("skip.header.line.count"="1");
+
+DROP TABLE IF EXISTS TEST;
+
+CREATE EXTERNAL TABLE IF NOT EXISTS TEST (
+a DATE,
+b STRING,
+c INT,
+d STRING,
+e STRING,
+f INT,
+g STRING,
+h INT,
+i INT
+)
+STORED AS ORC
+LOCATION '/user/hive/test';
+
+INSERT OVERWRITE TABLE TEST
+SELECT * FROM MULGA;
+```
