@@ -165,3 +165,35 @@ LOCATION '/user/hive/test';
 INSERT OVERWRITE TABLE TEST
 SELECT * FROM MULGA;
 ```
+
+- Hive 3.0 이상 부터 Mapreduce 를 권장하지 않는다 spark / tez 로 변경을 추천하지만 tez 환경설정 도중 classpath 가 오류가 나는지 hive가 작동을 하지 않는다… 이후 계속 고민해 봐야할 부분 (버전마다, 블로그마다 )
+
+
+### mysql 연동에 관한 고찰
+
+- **hive-site.xml**
+
+```xml
+<configuration>
+    <property>   
+        <name>hive.metastore.local</name>   
+        <value>false</value>   
+    </property>   
+    <property>   
+        <name>hive.metastore.warehouse.dir</name>
+        <value>hdfs://master:9000/user/hive/warehouse</value>
+    </property>
+    <property>
+        <name>javax.jdo.option.ConnectionURL</name>
+        <value>jdbc:mysql://master:3306/hive?createDatabaseIfNotExist=true</value>
+    </property>
+    <property>
+        <name>javax.jdo.option.ConnectionUserName</name>
+        <value>hive</value>
+    </property>
+    <property>
+        <name>javax.jdo.option.ConnectionPassword</name>
+        <value>hive</value>
+    </property>
+</configuration>
+```
