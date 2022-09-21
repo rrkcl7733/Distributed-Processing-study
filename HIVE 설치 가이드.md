@@ -197,3 +197,14 @@ SELECT * FROM MULGA;
     </property>
 </configuration>
 ```
+connectionURL 예시 :    ` jdbc:mysql://localhost/metastore?createDatabaseIfNotExist=true`
+##### 접속하기
+- `mysql -u root -p`
+- 비밀번호 입력은 root 계정 비밀번호
+- 들어와서 `CREATE USER '생성할 id'@'%' IDENTIFIED BY '비밀번호';`
+- `GRANT all on *.* to '생성할 id'@'%';`
+- `flush privileges;`
+
+`schematool -dbType mysql -initSchema`
+
+`schematool -initSchema -dbType mysql -userName ssafy -passWord 'BigDataDDP77!' -verbose`
