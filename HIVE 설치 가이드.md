@@ -165,6 +165,12 @@ LOCATION '/user/hive/test';
 INSERT OVERWRITE TABLE TEST
 SELECT * FROM MULGA;
 ```
+  
+```sql
+export table 테이블이름 to '폴더';
+```
+
+
 
 - Hive 3.0 이상 부터 Mapreduce 를 권장하지 않는다 spark / tez 로 변경을 추천하지만 tez 환경설정 도중 classpath 가 오류가 나는지 hive가 작동을 하지 않는다… 이후 계속 고민해 봐야할 부분 (버전마다, 블로그마다 )
 
