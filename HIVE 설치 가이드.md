@@ -214,3 +214,10 @@ connectionURL 예시 :    ` jdbc:mysql://localhost/metastore?createDatabaseIfNot
 `schematool -dbType mysql -initSchema`
 
 `schematool -initSchema -dbType mysql -userName ssafy -passWord 'BigDataDDP77!' -verbose`
+
+
+##### JDBC Program
+Given below is the JDBC program to apply the Group By clause for the given example
+```java
+
+```
