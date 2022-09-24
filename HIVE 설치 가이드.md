@@ -187,7 +187,7 @@ export table 테이블이름 to '폴더';
     </property>   
     <property>   
         <name>hive.metastore.warehouse.dir</name>
-        <value>hdfs://master:9000/user/hive/warehouse</value>
+        <value>/user/hive/warehouse</value>
     </property>
     <property>
         <name>javax.jdo.option.ConnectionURL</name>
@@ -216,8 +216,85 @@ connectionURL 예시 :    ` jdbc:mysql://localhost/metastore?createDatabaseIfNot
 `schematool -initSchema -dbType mysql -userName ssafy -passWord 'BigDataDDP77!' -verbose`
 
 
-##### JDBC Program
-Given below is the JDBC program to apply the Group By clause for the given example
-```java
+—
 
+### Apache Sqoop
+> 스쿱은 구조화된 관계형 데이터 베이스와 아파치 하둡간의 대용량 데이터들을 효율적으로 변환하여 주는 명령 줄 인터페이스 애플리케이션
+
+```bash
+wget http://mirror.navercorp.com/apache/sqoop/1.4.7/sqoop-1.4.7.bin__hadoop-2.6.0.tar.gz
+tar -xvf sqoop-1.4.7.bin__hadoop-2.6.0.tar.gz
+ln -s sqoop-1.4.7.bin__hadoop-2.6.0 sqoop
+```
+심볼릭 링크 설정 후 환경변수 설정
+```bash
+nano ~/.bashrc
+
+export SQOOP_HOME=/home/user이름/sqoop
+export SQOOP_CONF_DIR=$SQOOP_HOME/conf
+export PATH=$PATH:SQOOP_HOME/bin
+
+export HCAT_HOME=/home/user이름/hive폴더/hcatalog
+
+source ~/.bashrc
+```
+- **HCAT_HOME 설정해야 하는 이유**
+sqoop 으로 hive 의 ORC 형식의 table을 export 할 경우 hcatalog 옵션을 추가해야 하기 때문. `Exception in thread "main" java.lang.NoClassDefFoundError: org/apache/hive/hcatalog/mapreduce/HCatOutputFormat` 이 오류가 나지 않게 하기 위해서.
+
+Sqoop 에 하둡설정을 추가해야 한다.
+```bash
+cp sqoop/conf/sqoop-env-template.sh sqoop/conf/sqoop-env.sh
+cd sqoop/conf/
+nano sqoop-env.sh
+```
+
+```bash
+export HADOOP_HOME=/home/user이름/hadoop
+export HADOOP_COMMON_HOME=/home/user이름/hadoop
+export HADOOP_MAPRED_HOME=/home/user이름/hadoop
+export HIVE_HOME=/home/user이름/hive
+```
+
+이제 Sqoop 에 DBMS 연결 드라이버를 넣어야 한다.
+```bash
+mv mysql-connector-java-8.0.22.jar /home/hadoop/sqoop/lib
+```
+SQOOP의 jar 파일을 하둡에 넣어야 한다.
+```bash
+cd sqoop
+cp sqoop-1.4.7.jar /home/hadoop/hadoop/share/hadoop/tools/lib/
+```
+
+`java.lang.NoClassDefFoundError: org/apache/commons/lang/StringUtils` 오류뜨는 꼴 안보려면 commons-lang 설치하러 가자.
+```bash
+wget https://mirror.navercorp.com/apache//commons/lang/binaries/commons-lang-2.6-bin.tar.gz
+tar -xvf commons-lang-2.6-bin.tar.gz
+cd commons-lang-2.6
+cp commons-lang-2.6.jar /home/hadoop/sqoop/lib
+```
+이후 겹치는 파일을 수정해준다.
+```bash
+cd /home/hadoop/sqoop/lib/
+ll common*
+mv commons-lang3-3.4.jar commons-lang3-3.4.jar.bak
+```
+- mysql 프로세스 재구동
+```bash
+systemctl restart mysql
+```
+
+##### 끝??
+```bash
+sqoop help
+```
+입력하면 hbase, zookeeper 등 warning이 경로설정 안했다는 warning 뜨면 성공!!
+
+이제 orc 타입의 table 을 hive 에 만들러 가자
+```sql
+create table customers(컬럼들) row format delimited fields terminated by ',' stored as orc;
+```
+데이터 집어넣은 다음에
+
+```bash
+sqoop export -connect jdbc:mysql://j7a305.p.ssafy.io:3306/gamul_db -username ssafy -P --table mysql에준비된테이블 --hcatalog-database default --hcatalog-table hive의테이블이름
 ```
