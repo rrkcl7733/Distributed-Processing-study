@@ -170,6 +170,21 @@ SELECT * FROM MULGA;
 export table 테이블이름 to '폴더';
 ```
 
+#### 팁 ) auto_increment hive에 적용시키기
+
+```
+hive>add jar /home/hadoop/hive/lib/hive-contrib-3.1.2.jar;
+
+hive>create temporary function row_sequence as 'org.apache.hadoop.hive.contrib.udf.UDFRowSequence';
+```
+하고 나서 덮어씌울 테이블을 준비한 뒤
+```sql
+insert overwrite table 그것
+select row_sequence(), 컬럼들
+from something;
+```
+
+
 
 
 - Hive 3.0 이상 부터 Mapreduce 를 권장하지 않는다 spark / tez 로 변경을 추천하지만 tez 환경설정 도중 classpath 가 오류가 나는지 hive가 작동을 하지 않는다… 이후 계속 고민해 봐야할 부분 (버전마다, 블로그마다 )
