@@ -183,7 +183,13 @@ insert overwrite table 그것
 select row_sequence(), 컬럼들
 from something;
 ```
-
+#### 팁) date type 활용하기
+```sql
+select date_format(컬럼, 'yyyy-MM-dd')
+-> 결과 : 2022-09-27
+select date_format(컬럼, 'yyyy-MM')
+-> 결과 : 2022-09
+```
 
 
 
@@ -298,7 +304,7 @@ mv commons-lang3-3.4.jar commons-lang3-3.4.jar.bak
 systemctl restart mysql
 ```
 
-##### 끝??
+##### sqoop 으로 RDB 연동
 ```bash
 sqoop help
 ```
@@ -313,3 +319,30 @@ create table customers(컬럼들) row format delimited fields terminated by ',' 
 ```bash
 sqoop export -connect jdbc:mysql://j7a305.p.ssafy.io:3306/gamul_db -username ssafy -P --table mysql에준비된테이블 --hcatalog-database default --hcatalog-table hive의테이블이름
 ```
+
+—
+#### hive에서 update 하기.
+hive에서 update 나 delete를 시도하면 `### FAILED: SemanticException \[Error 10294\]: Attempt to do update or delete using transaction manager that does not support these operations.` 오류가 발생한다.
+이를 해결하기 위해 확인해야하는 설정들은 hive-site.xml 에서
+```
+hive.auto.convert.join.noconditionaltask.size = 10000000
+hive.support.concurrency = true
+hive.enforce.bucketing = true
+hive.exec.dynamic.partition.mode = nonstrict
+hive.txn.manager = org.apache.hadoop.hive.ql.lockmgr.DbTxnManager
+hive.compactor.initiator.on = true
+hive.compactor.worker.threads = 1
+```
+목록들을 확인하고 create table 설정 중 `tblproperties("transactional" = "true")` 설정한 테이블을 생성하면 거기서 update / delete 를 실행할 수 있다.
+
+**그러나** 나의 문제는 hive에서 subquery 를 지원안한다는 것. update 를 다른 table 에서 찾아와서 수정하는 과정을 지원하지 않는다.
+-> 자체를 overwrite 해버릴 것이고 `left join` 으로 해결
+```sql
+insert overwrite table table2 
+select t1.id, 
+       t2.Date,
+       t2.amount 
+from table2 t2 left join table t1 
+     on t1.id=t2.id
+```
+이런 느낌
