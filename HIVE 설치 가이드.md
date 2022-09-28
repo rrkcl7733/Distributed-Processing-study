@@ -173,7 +173,7 @@ export table 테이블이름 to '폴더';
 #### 팁 ) auto_increment hive에 적용시키기
 
 ```
-hive>add jar /home/hadoop/hive/lib/hive-contrib-3.1.2.jar;
+hive>add jar /home/hadoop/apache-hive-3.1.2-bin/lib/hive-contrib-3.1.2.jar;
 
 hive>create temporary function row_sequence as 'org.apache.hadoop.hive.contrib.udf.UDFRowSequence';
 ```
@@ -181,6 +181,11 @@ hive>create temporary function row_sequence as 'org.apache.hadoop.hive.contrib.u
 ```sql
 insert overwrite table 그것
 select row_sequence(), 컬럼들
+from something;
+
+갑자기 덮어씌기가 안된다면
+create table 그것
+as select row_sequence(), 컬럼들
 from something;
 ```
 #### 팁) date type 활용하기
@@ -319,6 +324,16 @@ create table customers(컬럼들) row format delimited fields terminated by ',' 
 ```bash
 sqoop export -connect jdbc:mysql://j7a305.p.ssafy.io:3306/gamul_db -username ssafy -P --table mysql에준비된테이블 --hcatalog-database default --hcatalog-table hive의테이블이름
 ```
+### 만약 오류가 난다?
+오류코드를 제대로 알 수 없으니 log 를 보아야 한다.
+`start-yarn.sh` 으로 처음부터 킨 다음에 `localhost:8088` 접속하여 ![application 확인](Scala 언어 학습/asset/15b919446819bce20b5878adb070df9b.png)
+
+먼저 application 아이디를 확인!
+```bash
+yarn logs -applicationId application_1652259389202_0189
+```
+입력하면 진짜 오류를 볼 수 있다!
+
 
 —
 #### hive에서 update 하기.
