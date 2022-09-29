@@ -334,6 +334,10 @@ yarn logs -applicationId application_1652259389202_0189
 ```
 입력하면 진짜 오류를 볼 수 있다!
 
+#### `FAILED: Execution Error, return code 1 from org.apache.hadoop.hive.ql.exec.DDLTask. Unable to alter table. The following columns have types incompatible with the existing columns in their respective positions :`
+
+> `set hive.metastore.disallow.incompatible.col.type.changes=false;`
+
 
 —
 #### hive에서 update 하기.
