@@ -361,7 +361,7 @@ insert overwrite table table2
 select t1.id, 
        t2.Date,
        t2.amount 
-from table2 t2 left join table t1 
+from table2 t2 left join table1 t1 
      on t1.id=t2.id
 ```
 이런 느낌
