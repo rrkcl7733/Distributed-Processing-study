@@ -72,3 +72,21 @@ ubuntu이미지는 ubuntu를 실행하기 위한 모든 파일을 가지고있�
 ![이미지경로.png](Scala 언어 학습/asset/이미지경로.png)
 
 이미지는 url방식으로 관리하며 태그를 붙일 수 있다. ubuntu 14.04 이미지는 `docker.io/library/ubuntu:14.04`또는 `docker.io/library/ubunty:trusty`이고 `docker.io/library`는 생략가능하여 `ubuntu:14.04`로 사용할 수 있다. 이러한 방식은 이해하기도 쉽고 편리하게 사용할 수 있으며 태그기능을 잘 이용하면 테스트나 롤백도 쉽게 할수 있다
+
+#### 도커파일 Dockerfile
+```docker
+# vertx/vertx3 debian version
+FROM subicura/vertx3:3.3.1
+MAINTAINER chungsub.kim@purpleworks.co.kr
+
+ADD build/distributions/app-3.3.1.tar /
+ADD config.template.json /app-3.3.1/bin/config.json
+ADD docker/script/start.sh /usr/local/bin/
+RUN ln -s /usr/local/bin/start.sh /start.sh
+
+EXPOSE 8080
+EXPOSE 7000
+
+CMD ["start.sh"]
+```
+도커는 이미지를 만들기 위해 `Dockerfile`이라는 파일에 자체 DSL(Domain-specific-language)언어를 이용하여 이미지 생성 과정을 적는다. 추후에 문법에 대해 자세히 다루겠지만 위 샘플을 보면 그렇게 복잡하지 않다는 것을 알수 있다.
