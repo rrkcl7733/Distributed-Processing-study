@@ -90,3 +90,18 @@ ps명령어는 실행중인 컨테이너 목록을 보여준다. detached mode�
 
 데이터 볼륨을 사용하는 방법중 호스트의 디렉토리를 마운트해서 사용하는 방법을 보자.  
 run 명령어에서 소개한 옵션중 -v옵션을 사용한다. mysql이라면 `/var/lib/mysql`디렉토리에 모든 데이터베이스 정보가 담기므로 호스트의 특정 디렉토리를 연결해 주면된다
+```docker
+#before
+docker run -d -p 3306:3306 \
+-e MYSQL_ALLOW_EMPTY_PASSWORD=true \
+--name mysql \
+mysql:5.7
+
+#after
+docker run -d -p 3306:3306 \
+-e MYSQL_ALLOW_EMPTY_PASSWROD=true \
+--name mysql \
+-v /my/own/datadir:/var/lib/mysql \ # <- vlume mount
+mysql:5.7
+```
+위의 예시에서는 호스트이 `/my/won/datadir`디렉토리를 컨테인의 `/var/lib/mysql`디렉토리로 마운트했다. 이제 데이터베이스 파일은 호스트의 `/my/won/datadir` 디렉토리에 저장되고 컨테이너를 삭제해도 데이터는 사라지지 않는다. 최신 버전의 MySql이미지를 다운받고 다시 컨테이너를 실행할때 동일한 디렉토리를 마운트하면 그대로 데이터를 사용할수 있는것이다.
