@@ -105,3 +105,49 @@ docker run -d -p 3306:3306 \
 mysql:5.7
 ```
 위의 예시에서는 호스트이 `/my/won/datadir`디렉토리를 컨테인의 `/var/lib/mysql`디렉토리로 마운트했다. 이제 데이터베이스 파일은 호스트의 `/my/won/datadir` 디렉토리에 저장되고 컨테이너를 삭제해도 데이터는 사라지지 않는다. 최신 버전의 MySql이미지를 다운받고 다시 컨테이너를 실행할때 동일한 디렉토리를 마운트하면 그대로 데이터를 사용할수 있는것이다.
+
+## Docker Compose
+
+지금까지 도커를 커맨드라인에서 명령어로 작업했다. 이런 간단하고 단순 작업이라면 괜찮지만 컨테이너 조합이 많아지고 여러가지 설정이 추가되면 명령어가 복잡해진다
+
+도커는 복잡한 설정을 쉽게 관리하기 위해 YAML방식의 설정파일을 이용한 Docker Compose라는 툴을 제공한다. 깊게 파고들면 은근 기능이 많고 복잡하므로 가볍게만 보자
+
+#### 설치하기
+
+docker for mac으로 설치했다면 자동으로 설치가 된다
+
+#### Docker Compose 이용해서 Wordpress만들기
+
+먼저 빈디렉토리를 하나 만들고 `docker-compose.yml`파일을 만들어 설정을 입력한다.
+```docker
+version: '2'
+
+services:
+   db:
+     image: mysql:5.7
+     volumes:
+       - db_data:/var/lib/mysql
+     restart: always
+     environment:
+       MYSQL_ROOT_PASSWORD: wordpress
+       MYSQL_DATABASE: wordpress
+       MYSQL_USER: wordpress
+       MYSQL_PASSWORD: wordpress
+
+   wordpress:
+     depends_on:
+       - db
+     image: wordpress:latest
+     volumes:
+       - wp_data:/var/www/html
+     ports:
+       - "8000:80"
+     restart: always
+     environment:
+       WORDPRESS_DB_HOST: db:3306
+       WORDPRESS_DB_PASSWORD: wordpress
+volumes:
+    db_data:
+    wp_data:
+```
+파일에 위 코드를 치고 `docker-compose up`명령어를 치면 워드프레스가 설치된다
